@@ -14,7 +14,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packagingOptions {
-        resources.excludes.add("META-INF/*.kotlin_module")
+        resources.excludes.apply {
+            add("META-INF/DEPENDENCIES")
+        }
     }
     buildTypes {
         getByName("release") {
@@ -47,6 +49,8 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation("it.skrape:skrapeit:1.2.0")
+
     implementation(libs.bundles.app.ui)
     coreLibraryDesugaring(libs.android.desugaring)
     implementation(libs.koin.android)

@@ -65,6 +65,8 @@ kotlin {
                 implementation(libs.touchlab.stately)
                 implementation(libs.multiplatformSettings.common)
                 implementation(libs.kotlinx.dateTime)
+                implementation(libs.ktor.client.core)
+
                 api(libs.touchlab.kermit)
             }
         }
@@ -77,11 +79,15 @@ kotlin {
             dependencies {
                 implementation(libs.sqlDelight.android)
                 implementation(libs.ktor.client.okHttp)
+                implementation("it.skrape:skrapeit:1.2.0")
+
             }
         }
         val androidTest by getting {
             dependencies {
                 implementation(libs.bundles.shared.androidTest)
+                implementation(kotlin("test-junit"))
+                implementation("junit:junit:4.13.2")
             }
         }
         val iosMain by getting {
