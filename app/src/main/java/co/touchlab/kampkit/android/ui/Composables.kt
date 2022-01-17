@@ -20,7 +20,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,72 +28,66 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import co.touchlab.kampkit.android.BreedViewModel
 import co.touchlab.kampkit.android.R
+import co.touchlab.kampkit.data.HowLongToBeatEntry
+import co.touchlab.kampkit.data.SearchState
 import co.touchlab.kampkit.db.Breed
-import co.touchlab.kampkit.models.DataState
-import co.touchlab.kampkit.models.ItemDataSummary
 import co.touchlab.kermit.Logger
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun MainScreen(
-    viewModel: BreedViewModel,
+    viewModel: SearchViewModel,
     log: Logger
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleAwareDogsFlow = remember(viewModel.breedStateFlow, lifecycleOwner) {
-        viewModel.breedStateFlow.flowWithLifecycle(lifecycleOwner.lifecycle)
+
+    val lifecycleAwareSearchFlow = remember(viewModel.searchStateFlow, lifecycleOwner) {
+        viewModel.searchStateFlow.flowWithLifecycle(lifecycleOwner.lifecycle)
     }
 
     @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
-    val dogsState by lifecycleAwareDogsFlow.collectAsState(viewModel.breedStateFlow.value)
+    val searchState by lifecycleAwareSearchFlow.collectAsState(viewModel.searchStateFlow.value)
 
     MainScreenContent(
-        dogsState = dogsState,
-        onRefresh = { viewModel.refreshBreeds(true) },
-        onSuccess = { data -> log.v { "View updating with ${data.allItems.size} breeds" } },
+        searchState = searchState,
+        onRefresh = { viewModel.getEntriesByQuery("Zelda")},
+        onSuccess = { data -> log.v { "View updating with ${data.size} games" } },
         onError = { exception -> log.e { "Displaying error: $exception" } },
-        onFavorite = { viewModel.updateBreedFavorite(it) }
+        // onFavorite = { viewModel.updateBreedFavorite(it) }
     )
 }
 
 @Composable
 fun MainScreenContent(
-    dogsState: DataState<ItemDataSummary>,
+    searchState: SearchState,
     onRefresh: () -> Unit = {},
-    onSuccess: (ItemDataSummary) -> Unit = {},
+    onSuccess: (List<HowLongToBeatEntry>) -> Unit = {},
     onError: (String) -> Unit = {},
-    onFavorite: (Breed) -> Unit = {}
+    // onFavorite: (Breed) -> Unit = {}
 ) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
     ) {
         SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = dogsState.loading),
+            state = rememberSwipeRefreshState(isRefreshing = searchState is SearchState.Loading),
             onRefresh = onRefresh
         ) {
-            if (dogsState.empty) {
-                Empty()
-            }
-            val data = dogsState.data
-            if (data != null) {
-                LaunchedEffect(data) {
-                    onSuccess(data)
+
+            when (searchState) {
+                is SearchState.Success -> {
+                    onSuccess(searchState.entries)
+                    Success(successData = searchState.entries)
                 }
-                Success(successData = data, favoriteBreed = onFavorite)
-            }
-            val exception = dogsState.exception
-            if (exception != null) {
-                LaunchedEffect(exception) {
-                    onError(exception)
+                is SearchState.Error -> {
+                    onError(searchState.error.message ?: "There was an error")
                 }
-                Error(exception)
+                is SearchState.Loading -> {
+                }
             }
         }
     }
@@ -128,17 +121,17 @@ fun Error(error: String) {
 
 @Composable
 fun Success(
-    successData: ItemDataSummary,
-    favoriteBreed: (Breed) -> Unit
+    successData: List<HowLongToBeatEntry>,
+    // favoriteBreed: (Breed) -> Unit
 ) {
-    DogList(breeds = successData.allItems, favoriteBreed)
+    GameList(breeds = successData)
 }
 
 @Composable
-fun DogList(breeds: List<Breed>, onItemClick: (Breed) -> Unit) {
+fun GameList(breeds: List<HowLongToBeatEntry>, onItemClick: (HowLongToBeatEntry) -> Unit = {}) {
     LazyColumn {
         items(breeds) { breed ->
-            DogRow(breed) {
+            GameRow(breed) {
                 onItemClick(it)
             }
             Divider()
@@ -147,14 +140,13 @@ fun DogList(breeds: List<Breed>, onItemClick: (Breed) -> Unit) {
 }
 
 @Composable
-fun DogRow(breed: Breed, onClick: (Breed) -> Unit) {
+fun GameRow(game: HowLongToBeatEntry, onClick: (HowLongToBeatEntry) -> Unit) {
     Row(
         Modifier
-            .clickable { onClick(breed) }
+            .clickable { onClick(game) }
             .padding(10.dp)
     ) {
-        Text(breed.name, Modifier.weight(1F))
-        FavoriteIcon(breed)
+        Text(game.title!!, Modifier.weight(1F))
     }
 }
 
@@ -181,18 +173,18 @@ fun FavoriteIcon(breed: Breed) {
     }
 }
 
-@Preview
-@Composable
-fun MainScreenContentPreview_Success() {
-    MainScreenContent(
-        dogsState = DataState(
-            data = ItemDataSummary(
-                longestItem = null,
-                allItems = listOf(
-                    Breed(0, "appenzeller", 0),
-                    Breed(1, "australian", 1)
-                )
-            )
-        )
-    )
-}
+// @Preview
+// @Composable
+// fun MainScreenContentPreview_Success() {
+//     MainScreenContent(
+//         dogsState = DataState(
+//             data = ItemDataSummary(
+//                 longestItem = null,
+//                 allItems = listOf(
+//                     Breed(0, "appenzeller", 0),
+//                     Breed(1, "australian", 1)
+//                 )
+//             )
+//         )
+//     )
+// }

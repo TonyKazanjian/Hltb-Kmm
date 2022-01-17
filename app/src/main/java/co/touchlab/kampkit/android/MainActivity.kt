@@ -1,14 +1,12 @@
 package co.touchlab.kampkit.android
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.lifecycleScope
 import co.touchlab.kampkit.android.ui.MainScreen
+import co.touchlab.kampkit.android.ui.SearchViewModel
 import co.touchlab.kampkit.android.ui.theme.KaMPKitTheme
 import co.touchlab.kampkit.injectLogger
-import co.touchlab.kampkit.scraper.AndroidSearchInteractor
 import co.touchlab.kermit.Logger
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
@@ -16,7 +14,7 @@ import org.koin.core.component.KoinComponent
 class MainActivity : ComponentActivity(), KoinComponent {
 
     private val log: Logger by injectLogger("MainActivity")
-    private val viewModel: BreedViewModel by viewModel()
+    private val viewModel: SearchViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,15 +23,6 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 MainScreen(viewModel, log)
             }
         }
-        // if (viewModel.breedStateFlow.value.data == null) {
-        //     viewModel.refreshBreeds()
-        // }
-
-        lifecycleScope.launchWhenResumed {
-            val searchFactory = AndroidSearchInteractor()
-            val result = searchFactory.search("Yakuza")
-
-            Log.d("TONY", "${result.entryList}")
-        }
+        viewModel.getEntriesByQuery("Yakuza")
     }
 }
