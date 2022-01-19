@@ -1,7 +1,7 @@
 package co.touchlab.kampkit.data
 
-sealed class SearchState {
-    data class Success(val entries: List<HowLongToBeatEntry>): SearchState()
-    data class Error(val error: Exception): SearchState()
-    object Loading: SearchState()
-}
+data class SearchState(
+    val entries: List<HowLongToBeatEntry> = emptyList(),
+    val error: Exception? = null,
+    val isLoading: Boolean = false
+)

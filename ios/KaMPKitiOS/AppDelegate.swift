@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var log = koin.loggerWithTag(tag: "AppDelegate")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+            startKoin()
             // this line is important
             self.window = UIWindow(frame: UIScreen.main.bounds)
 

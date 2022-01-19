@@ -16,7 +16,7 @@ class SearchViewModel(private val repository: SearchRepository = SearchRepositor
     val queryStateFlow = repository.query
 
     val searchStateFlow: StateFlow<SearchState> = repository.searchGames(1)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SearchState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SearchState(isLoading = true))
 
     fun getEntriesByQuery(query: String){
         repository.setGameQuery(query)

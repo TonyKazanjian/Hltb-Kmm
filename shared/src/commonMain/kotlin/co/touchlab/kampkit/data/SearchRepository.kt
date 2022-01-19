@@ -36,9 +36,13 @@ class SearchRepository(private val searchInteractor: SearchInteractor) {
     private suspend fun launchSearch(gameQuery: String, page: Int): SearchState {
         return try {
             val entries = searchInteractor.search(gameQuery, page).entryList
-            SearchState.Success(entries)
+            SearchState(
+                entries = entries
+            )
         } catch (e: Exception){
-            SearchState.Error(e)
+            SearchState(
+                error = e
+            )
         }
     }
 }

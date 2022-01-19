@@ -3,8 +3,8 @@ package co.touchlab.kampkit.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import co.touchlab.kampkit.android.ui.MainScreen
 import co.touchlab.kampkit.android.ui.SearchViewModel
+import co.touchlab.kampkit.android.ui.screens.SearchScreen
 import co.touchlab.kampkit.android.ui.theme.KaMPKitTheme
 import co.touchlab.kampkit.injectLogger
 import co.touchlab.kermit.Logger
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
         setContent {
             KaMPKitTheme {
-                MainScreen(viewModel, log)
+                SearchScreen(viewModel, log)
             }
         }
         viewModel.getEntriesByQuery("Yakuza")

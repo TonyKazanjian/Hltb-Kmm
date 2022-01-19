@@ -10,17 +10,17 @@ import Foundation
 import shared
 import UIKit
 
-class SearchViewController: UIViewController {
-    
-    let searchInteractor = IOSSearchInteractor()
-    
+class SearchViewController: UITableViewController {
+
+    @IBOutlet var gameTableView: UITableView!
+
+    let searchViewModel = IOSSearchViewModel(repository: SearchRepository(searchInteractor: IOSSearchInteractor())) { searchState in
+//        print("\(searchState)")
+        let entries = searchState.entries
+        print("\(entries)")
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        searchInteractor.search(query: "Yakuza", page: 1) {response,error in
-            
-            print("\(String(describing: response))")
-        }
+        searchViewModel.setQuery(query: "Yakuza")
     }
-    
 }

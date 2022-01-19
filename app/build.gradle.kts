@@ -49,8 +49,9 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("it.skrape:skrapeit:1.2.0")
 
+    // Image loading
+    implementation("com.github.skydoves:landscapist-coil:1.4.5")
     implementation(libs.bundles.app.ui)
     coreLibraryDesugaring(libs.android.desugaring)
     implementation(libs.koin.android)
