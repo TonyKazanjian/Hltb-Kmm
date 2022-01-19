@@ -1,4 +1,4 @@
-package co.touchlab.kampkit.android.ui.screens
+package co.touchlab.kampkit.android.ui.search
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,10 +55,13 @@ fun SearchScreen(
 
     val gameQuery = rememberSaveable{ mutableStateOf("")}
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Scaffold(
         topBar = {
             SearchAppBar(
                 query = gameQuery.value,
+                keyboardController = keyboardController,
                 onQueryChanged = {
                     gameQuery.value = it
                 },
@@ -68,7 +75,10 @@ fun SearchScreen(
     ) {
         SearchResultContent(
             searchState = searchState,
-            onSuccess = { data -> log.v { "View updating with ${data.size} games" } },
+            onSuccess = { data ->
+                log.v { "View updating with ${data.size} games" }
+                keyboardController?.hide()
+            },
             onError = { exception -> log.e { "Displaying error: $exception" } },
             // onFavorite = { viewModel.updateBreedFavorite(it) }
         )

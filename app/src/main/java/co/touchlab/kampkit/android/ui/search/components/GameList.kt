@@ -13,7 +13,7 @@ import co.touchlab.kampkit.data.HowLongToBeatEntry
 fun GameList(games: List<HowLongToBeatEntry>, onItemClick: (HowLongToBeatEntry) -> Unit = {}) {
     LazyColumn {
         items(games) { breed ->
-            GameRow(breed, Modifier.wrapContentHeight().fillMaxWidth()) {
+            GameRow(breed, Modifier.fillParentMaxWidth().wrapContentHeight()) {
                 onItemClick(it)
             }
             Divider()

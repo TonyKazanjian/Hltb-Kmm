@@ -22,7 +22,7 @@ fun GameRow(game: HowLongToBeatEntry, modifier: Modifier, onClick: (HowLongToBea
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
+        modifier = modifier
             .clickable { onClick(game) }
             .padding(10.dp)
     ) {
