@@ -1,4 +1,4 @@
-package co.touchlab.kampkit.android.ui.components
+package co.touchlab.kampkit.android.ui.search.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

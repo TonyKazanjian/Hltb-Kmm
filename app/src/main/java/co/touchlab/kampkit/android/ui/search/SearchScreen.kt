@@ -4,30 +4,37 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import co.touchlab.kampkit.android.R
 import co.touchlab.kampkit.android.ui.SearchViewModel
-import co.touchlab.kampkit.android.ui.components.GameList
+import co.touchlab.kampkit.android.ui.search.components.GameList
+import co.touchlab.kampkit.android.ui.search.components.SearchAppBar
 import co.touchlab.kampkit.data.HowLongToBeatEntry
 import co.touchlab.kampkit.data.SearchState
 import co.touchlab.kermit.Logger
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
+@ExperimentalComposeUiApi
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
@@ -42,19 +49,35 @@ fun SearchScreen(
     @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
     val searchState by lifecycleAwareSearchFlow.collectAsState(viewModel.searchStateFlow.value)
 
-    SearchResultContent(
-        searchState = searchState,
-        onRefresh = { viewModel.getEntriesByQuery("Zelda")},
-        onSuccess = { data -> log.v { "View updating with ${data.size} games" } },
-        onError = { exception -> log.e { "Displaying error: $exception" } },
-        // onFavorite = { viewModel.updateBreedFavorite(it) }
-    )
+    val gameQuery = rememberSaveable{ mutableStateOf("")}
+
+    Scaffold(
+        topBar = {
+            SearchAppBar(
+                query = gameQuery.value,
+                onQueryChanged = {
+                    gameQuery.value = it
+                },
+                onExecuteSearch = {
+                    viewModel.getEntriesByQuery(gameQuery.value)
+                },
+                onClearClick = {
+                    gameQuery.value = ""
+                })
+        }
+    ) {
+        SearchResultContent(
+            searchState = searchState,
+            onSuccess = { data -> log.v { "View updating with ${data.size} games" } },
+            onError = { exception -> log.e { "Displaying error: $exception" } },
+            // onFavorite = { viewModel.updateBreedFavorite(it) }
+        )
+    }
 }
 
 @Composable
 fun SearchResultContent(
     searchState: SearchState,
-    onRefresh: () -> Unit = {},
     onSuccess: (List<HowLongToBeatEntry>) -> Unit = {},
     onError: (String) -> Unit = {},
     // onFavorite: (Breed) -> Unit = {}
@@ -63,23 +86,25 @@ fun SearchResultContent(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
     ) {
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = searchState.isLoading),
-            onRefresh = onRefresh
-        ) {
-
-            if (searchState.isLoading) {
-
-            } else if (searchState.entries.isNotEmpty()){
-                onSuccess(searchState.entries)
-                Success(successData = searchState.entries)
-            } else if (searchState.error != null) {
-                onError(searchState.error?.message ?: "There was an error")
-                Error(
-                    error = searchState.error?.message ?: "There was an error"
-                )
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            when {
+                searchState.isLoading -> {
+                    //TODO - shimmer loading items
+                    CircularProgressIndicator(Modifier.size(48.dp))
+                }
+                searchState.entries.isNotEmpty() -> {
+                    onSuccess(searchState.entries)
+                    Success(successData = searchState.entries)
+                }
+                searchState.error != null -> {
+                    onError(searchState.error?.message ?: "There was an error")
+                    Error(
+                        error = searchState.error?.message ?: "There was an error"
+                    )
+                }
             }
         }
+
     }
 }
 
