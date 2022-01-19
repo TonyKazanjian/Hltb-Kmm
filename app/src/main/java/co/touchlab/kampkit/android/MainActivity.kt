@@ -25,6 +25,5 @@ class MainActivity : ComponentActivity(), KoinComponent {
                 SearchScreen(viewModel, log)
             }
         }
-        viewModel.getEntriesByQuery("Yakuza")
     }
 }

@@ -24,8 +24,6 @@ class SearchRepository(private val searchInteractor: SearchInteractor) {
 
     fun searchGames(page: Int): Flow<SearchState> {
         return _query
-            .debounce(300)
-            .filter { query -> query.isNotEmpty() }
             .flatMapLatest { query ->
                 flow {
                     emit(launchSearch(query, page))
