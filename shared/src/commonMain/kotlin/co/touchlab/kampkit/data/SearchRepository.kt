@@ -31,9 +31,9 @@ class SearchRepository(private val searchInteractor: SearchInteractor) {
         return try {
             val entries = searchInteractor.search(searchState.query, searchState.page).entryList
             searchState.entries.addAll(entries)
-            searchState.copy(entries = searchState.entries)
+            searchState.copy(entries = searchState.entries, isLoading = false)
         } catch (e: Exception){
-            searchState.copy(error = e)
+            searchState.copy(error = e, isLoading = false)
         }
     }
 }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
@@ -19,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,6 +36,7 @@ import co.touchlab.kampkit.android.ui.search.components.SearchAppBar
 import co.touchlab.kampkit.data.HowLongToBeatEntry
 import co.touchlab.kampkit.data.SearchState
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @Composable
@@ -51,6 +55,9 @@ fun SearchScreen(
 
     val gameQuery = rememberSaveable{ mutableStateOf("")}
 
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             SearchAppBar(
@@ -60,6 +67,9 @@ fun SearchScreen(
                 },
                 onExecuteSearch = {
                     viewModel.searchGamesByQuery(gameQuery.value)
+                    coroutineScope.launch {
+                        listState.scrollToItem(0)
+                    }
                 },
                 onClearClick = {
                     gameQuery.value = ""
@@ -68,6 +78,7 @@ fun SearchScreen(
     ) {
         SearchResultContent(
             searchState = searchState,
+            listState = listState,
             onTriggerNextPage = { viewModel.getNextPage() },
             onItemClicked = {}
             // onFavorite = { viewModel.updateBreedFavorite(it) }
@@ -78,8 +89,9 @@ fun SearchScreen(
 @Composable
 fun SearchResultContent(
     searchState: SearchState,
-    onTriggerNextPage: () -> Unit,
-    onItemClicked: (HowLongToBeatEntry) -> Unit
+    listState: LazyListState,
+    onTriggerNextPage: () -> Unit = {},
+    onItemClicked: (HowLongToBeatEntry) -> Unit = {}
     // onFavorite: (Breed) -> Unit = {}
 ) {
     Surface(
@@ -97,7 +109,8 @@ fun SearchResultContent(
                 searchState.entries.isNotEmpty() -> {
                     Success(
                         successData = searchState.entries,
-                        onTriggerNextPage = onTriggerNextPage) {
+                        onTriggerNextPage = onTriggerNextPage,
+                        listState = listState) {
                         onItemClicked(it)
                     }
                 }
@@ -128,11 +141,14 @@ fun Error(error: String) {
 @Composable
 fun Success(
     successData: List<HowLongToBeatEntry>,
+    listState: LazyListState,
     onTriggerNextPage: () -> Unit,
     onItemClicked: (HowLongToBeatEntry) -> Unit
 ) {
+
     GameList(
         games = successData,
+        listState = listState,
         onTriggerNextPage = onTriggerNextPage) {
         onItemClicked(it)
     }
@@ -159,7 +175,6 @@ fun MainScreenContentPreview_Success() {
                     "Completionist" to "36 hours")),
             )
         ),
-        onTriggerNextPage = {},
-        onItemClicked = {}
+        listState = rememberLazyListState()
     )
 }

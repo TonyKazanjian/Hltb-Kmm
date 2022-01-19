@@ -13,19 +13,17 @@ import org.koin.core.component.KoinComponent
 
 class SearchViewModel(private val repository: SearchRepository = SearchRepository(AndroidSearchInteractor())): ViewModel(), KoinComponent {
 
-    private val searchState = MutableStateFlow(SearchState())
+    private val searchState = repository.searchState
 
     val searchStateFlow: StateFlow<SearchState> = repository.searchGames()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SearchState(page = searchState.value.page, isLoading = searchState.value.isLoading))
 
     fun searchGamesByQuery(query: String){
-        searchState.value = SearchState(query = query)
-        repository.setSearchState(searchState.value)
+        repository.setSearchState(SearchState(query = query, isLoading = true))
     }
 
     fun getNextPage(){
-        searchState.value = searchState.value.copy(page = searchState.value.page + 1)
-        repository.setSearchState(searchState.value)
+        repository.setSearchState(searchState.value.copy(page = searchState.value.page + 1))
     }
 
 }
