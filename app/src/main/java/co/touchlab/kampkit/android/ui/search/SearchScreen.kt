@@ -23,16 +23,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import co.touchlab.kampkit.android.R
 import co.touchlab.kampkit.android.ui.SearchViewModel
 import co.touchlab.kampkit.android.ui.search.components.GameList
 import co.touchlab.kampkit.android.ui.search.components.SearchAppBar
@@ -57,18 +51,15 @@ fun SearchScreen(
 
     val gameQuery = rememberSaveable{ mutableStateOf("")}
 
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     Scaffold(
         topBar = {
             SearchAppBar(
                 query = gameQuery.value,
-                keyboardController = keyboardController,
                 onQueryChanged = {
                     gameQuery.value = it
                 },
                 onExecuteSearch = {
-                    viewModel.getEntriesByQuery(gameQuery.value)
+                    viewModel.searchGamesByQuery(gameQuery.value)
                 },
                 onClearClick = {
                     gameQuery.value = ""
@@ -77,11 +68,8 @@ fun SearchScreen(
     ) {
         SearchResultContent(
             searchState = searchState,
-            onSuccess = { data ->
-                log.v { "View updating with ${data.size} games" }
-                keyboardController?.hide()
-            },
-            onError = { exception -> log.e { "Displaying error: $exception" } },
+            onTriggerNextPage = { viewModel.getNextPage() },
+            onItemClicked = {}
             // onFavorite = { viewModel.updateBreedFavorite(it) }
         )
     }
@@ -90,8 +78,8 @@ fun SearchScreen(
 @Composable
 fun SearchResultContent(
     searchState: SearchState,
-    onSuccess: (List<HowLongToBeatEntry>) -> Unit = {},
-    onError: (String) -> Unit = {},
+    onTriggerNextPage: () -> Unit,
+    onItemClicked: (HowLongToBeatEntry) -> Unit
     // onFavorite: (Breed) -> Unit = {}
 ) {
     Surface(
@@ -107,11 +95,13 @@ fun SearchResultContent(
                     CircularProgressIndicator(Modifier.size(48.dp))
                 }
                 searchState.entries.isNotEmpty() -> {
-                    onSuccess(searchState.entries)
-                    Success(successData = searchState.entries)
+                    Success(
+                        successData = searchState.entries,
+                        onTriggerNextPage = onTriggerNextPage) {
+                        onItemClicked(it)
+                    }
                 }
                 searchState.error != null -> {
-                    onError(searchState.error?.message ?: "There was an error")
                     Error(
                         error = searchState.error?.message ?: "There was an error"
                     )
@@ -119,19 +109,6 @@ fun SearchResultContent(
             }
         }
 
-    }
-}
-
-@Composable
-fun Empty() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(stringResource(R.string.empty_breeds))
     }
 }
 
@@ -151,9 +128,14 @@ fun Error(error: String) {
 @Composable
 fun Success(
     successData: List<HowLongToBeatEntry>,
-    // favoriteBreed: (Breed) -> Unit
+    onTriggerNextPage: () -> Unit,
+    onItemClicked: (HowLongToBeatEntry) -> Unit
 ) {
-    GameList(games = successData)
+    GameList(
+        games = successData,
+        onTriggerNextPage = onTriggerNextPage) {
+        onItemClicked(it)
+    }
 }
 
 @Preview
@@ -161,7 +143,8 @@ fun Success(
 fun MainScreenContentPreview_Success() {
     SearchResultContent(
         searchState = SearchState(
-            entries = listOf(
+            page = 1,
+            entries = mutableListOf(
                 HowLongToBeatEntry("Yakuza 0", 0, "https://howlongtobeat.com/games/256px-Yakuza-sega.jpg", mapOf(
                     "Main Story" to "12 hours",
                     "Main Story + Extra" to "24 hours",
@@ -175,6 +158,8 @@ fun MainScreenContentPreview_Success() {
                     "Main Story + Extra" to "24 hours",
                     "Completionist" to "36 hours")),
             )
-        )
+        ),
+        onTriggerNextPage = {},
+        onItemClicked = {}
     )
 }

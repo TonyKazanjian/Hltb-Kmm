@@ -8,7 +8,7 @@ data class HowLongToBeatResponse(
 )
 
 data class HowLongToBeatEntry(
-    var title: String?,
+    val title: String?,
     val id: Int?,
     val imageUrl: String?,
     val timeLabels: Map<String, String>?

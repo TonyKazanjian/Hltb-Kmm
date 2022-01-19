@@ -4,43 +4,36 @@ import co.touchlab.kampkit.scraper.SearchInteractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class SearchRepository(private val searchInteractor: SearchInteractor) {
 
-    private var _query = MutableStateFlow("")
-    val query: StateFlow<String>
-        get() = _query.asStateFlow()
+    private var _searchState = MutableStateFlow(SearchState(isLoading = true))
+    val searchState = _searchState.asStateFlow()
 
-    fun setGameQuery(query: String) {
-        _query.value = query
+    fun setSearchState(searchState: SearchState){
+        _searchState.value = searchState
     }
 
-    fun searchGames(page: Int): Flow<SearchState> {
-        return _query
-            .flatMapLatest { query ->
+    fun searchGames(): Flow<SearchState> {
+        return _searchState
+            .flatMapLatest { state ->
                 flow {
-                    emit(launchSearch(query, page))
+                    emit(launchSearch(state))
                 }.flowOn(Dispatchers.Main)
             }
     }
 
-    private suspend fun launchSearch(gameQuery: String, page: Int): SearchState {
+    private suspend fun launchSearch(searchState: SearchState): SearchState {
         return try {
-            val entries = searchInteractor.search(gameQuery, page).entryList
-            SearchState(
-                entries = entries
-            )
+            val entries = searchInteractor.search(searchState.query, searchState.page).entryList
+            searchState.entries.addAll(entries)
+            searchState.copy(entries = searchState.entries)
         } catch (e: Exception){
-            SearchState(
-                error = e
-            )
+            searchState.copy(error = e)
         }
     }
 }

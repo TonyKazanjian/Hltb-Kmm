@@ -32,7 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -41,13 +41,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SearchAppBar(
     query: String,
-    keyboardController: SoftwareKeyboardController?,
     onQueryChanged: (String) -> Unit,
     onClearClick: () -> Unit,
     onExecuteSearch: () -> Unit
 ){
     var showClearButton by remember { mutableStateOf(false)}
     val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -87,7 +87,6 @@ fun SearchAppBar(
                     ) {
                         IconButton(onClick = {
                             onClearClick()
-                            keyboardController?.hide()
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
