@@ -1,6 +1,6 @@
-package co.touchlab.kampkit.ktor
+package co.touchlab.kampkit.remove.ktor
 
-import co.touchlab.kampkit.response.BreedResult
+import co.touchlab.kampkit.remove.response.BreedResult
 import io.ktor.client.engine.HttpClientEngine
 import co.touchlab.kermit.Logger as KermitLogger
 

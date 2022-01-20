@@ -1,6 +1,6 @@
 package co.touchlab.kampkit
 
-import co.touchlab.kampkit.ktor.DogApi
+import co.touchlab.kampkit.remove.ktor.DogApi
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import com.squareup.sqldelight.db.SqlDriver

@@ -3,7 +3,7 @@ package co.touchlab.kampkit.models
 import co.touchlab.kampkit.DatabaseHelper
 import co.touchlab.kampkit.db.Breed
 import co.touchlab.kampkit.injectLogger
-import co.touchlab.kampkit.ktor.DogApi
+import co.touchlab.kampkit.remove.ktor.DogApi
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.russhwolf.settings.Settings
