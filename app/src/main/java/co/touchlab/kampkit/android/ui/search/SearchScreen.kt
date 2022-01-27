@@ -1,7 +1,6 @@
 package co.touchlab.kampkit.android.ui.search
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -107,7 +106,7 @@ fun SearchResultContent(
                 }
                 searchState.entries.isNotEmpty() -> {
                     Success(
-                        successData = searchState.entries,
+                        successData = searchState,
                         onTriggerNextPage = onTriggerNextPage,
                         listState = listState) {
                         onItemClicked(it)
@@ -139,14 +138,14 @@ fun Error(error: String) {
 
 @Composable
 fun Success(
-    successData: List<HowLongToBeatEntry>,
+    successData: SearchState,
     listState: LazyListState,
     onTriggerNextPage: () -> Unit,
     onItemClicked: (HowLongToBeatEntry) -> Unit
 ) {
 
     GameList(
-        games = successData,
+        searchState = successData,
         listState = listState,
         onTriggerNextPage = onTriggerNextPage) {
         onItemClicked(it)

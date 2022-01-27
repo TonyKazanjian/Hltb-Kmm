@@ -1,6 +1,7 @@
 package co.touchlab.kampkit.data
 
 internal const val BASE_URL = "https://www.howlongtobeat.com"
+const val SEARCH_RESPONSE_PAGE_SIZE = 20
 data class HowLongToBeatResponse(
     var statusCode: Int = 0,
     var entryList: List<HowLongToBeatEntry> = mutableListOf(),

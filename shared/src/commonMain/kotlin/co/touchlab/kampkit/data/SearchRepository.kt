@@ -20,7 +20,9 @@ class SearchRepository(private val searchInteractor: SearchInteractor) {
                 flow {
                     emit(launchSearch(state))
                 }.onStart {
-                    emit(SearchState(isLoading = true))
+                    if (state.page == 1) {
+                        emit(SearchState(isLoading = true))
+                    }
                 }.flowOn(Dispatchers.Main)
             }
     }
