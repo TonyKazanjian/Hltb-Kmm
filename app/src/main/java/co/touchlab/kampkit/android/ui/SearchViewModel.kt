@@ -5,24 +5,32 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kampkit.data.SearchRepository
 import co.touchlab.kampkit.data.SearchState
 import co.touchlab.kampkit.scraper.AndroidSearchInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 
 class SearchViewModel(private val repository: SearchRepository = SearchRepository(AndroidSearchInteractor())): ViewModel(), KoinComponent {
 
-    private val searchState = repository.searchState
 
-    val searchStateFlow: StateFlow<SearchState> = repository.searchGames()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SearchState(page = searchState.value.page, isLoading = searchState.value.isLoading))
+    private val _searchStateFlow = MutableStateFlow(SearchState())
 
-    fun searchGamesByQuery(query: String){
-        repository.setSearchState(SearchState(query = query, isLoading = true))
+    fun setSearchQuery(query: String) {
+        _searchStateFlow.value = SearchState(
+            query = query,
+            isLoading = true)
+        repository.searchGames(_searchStateFlow)
     }
 
+    val searchStateFlow: StateFlow<SearchState> = repository.searchGames(_searchStateFlow)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SearchState())
+
+
     fun getNextPage(){
-        repository.setSearchState(searchState.value.copy(page = searchState.value.page + 1))
+        _searchStateFlow.value = searchStateFlow.value.copy(page = _searchStateFlow.value.page + 1)
+        repository.searchGames(_searchStateFlow)
     }
 
 }

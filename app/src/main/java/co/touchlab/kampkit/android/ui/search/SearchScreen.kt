@@ -1,6 +1,7 @@
 package co.touchlab.kampkit.android.ui.search
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,9 +65,7 @@ fun SearchScreen(
                 query = gameQuery.value,
                 onQueryChanged = {
                     gameQuery.value = it
-                },
-                onExecuteSearch = {
-                    viewModel.searchGamesByQuery(gameQuery.value)
+                    viewModel.setSearchQuery(it)
                     coroutineScope.launch {
                         listState.scrollToItem(0)
                     }

@@ -42,9 +42,7 @@ import androidx.compose.ui.unit.dp
 fun SearchAppBar(
     query: String,
     onQueryChanged: (String) -> Unit,
-    onClearClick: () -> Unit,
-    onExecuteSearch: () -> Unit
-){
+    onClearClick: () -> Unit){
     var showClearButton by remember { mutableStateOf(false)}
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -104,7 +102,6 @@ fun SearchAppBar(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        onExecuteSearch()
                         keyboardController?.hide()
                     },
                 )

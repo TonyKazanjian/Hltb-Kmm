@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -20,20 +17,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import co.touchlab.kampkit.android.ui.theme.DarkTransparent
 import co.touchlab.kampkit.data.HowLongToBeatEntry
 import com.skydoves.landscapist.coil.CoilImage
 
@@ -48,12 +39,6 @@ fun GameRow(game: HowLongToBeatEntry, modifier: Modifier, onClick: (HowLongToBea
     ) {
         Box(modifier = Modifier
             .requiredHeight(150.dp)){
-            val gradient = Brush.verticalGradient(
-                colors = listOf(Color.Transparent, Color.Black),
-                startY = 0f,  // 1/3
-                endY = 400.toFloat(),
-                tileMode = TileMode.Clamp
-            )
             CoilImage(
                 imageModel = game.imageUrl,
                 contentScale = ContentScale.FillHeight,
@@ -63,7 +48,7 @@ fun GameRow(game: HowLongToBeatEntry, modifier: Modifier, onClick: (HowLongToBea
                         scaleX = 4f,
                         scaleY = 4f
                     ))
-            Box(modifier = Modifier.matchParentSize().background(gradient))
+            Box(modifier = Modifier.matchParentSize().background(color = DarkTransparent))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,

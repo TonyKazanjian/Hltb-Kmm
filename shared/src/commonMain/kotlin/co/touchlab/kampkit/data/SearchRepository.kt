@@ -3,26 +3,24 @@ package co.touchlab.kampkit.data
 import co.touchlab.kampkit.scraper.SearchInteractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 
 class SearchRepository(private val searchInteractor: SearchInteractor) {
 
-    private var _searchState = MutableStateFlow(SearchState(isLoading = true))
-    val searchState = _searchState.asStateFlow()
-
-    fun setSearchState(searchState: SearchState){
-        _searchState.value = searchState
-    }
-
-    fun searchGames(): Flow<SearchState> {
-        return _searchState
+    fun searchGames(searchStateFlow: StateFlow<SearchState>): Flow<SearchState> {
+        return searchStateFlow
+            .debounce(300)
+            // .filter { it.query.isNotEmpty() }
             .flatMapLatest { state ->
                 flow {
                     emit(launchSearch(state))
+                }.onStart {
+                    emit(SearchState(isLoading = true))
                 }.flowOn(Dispatchers.Main)
             }
     }
