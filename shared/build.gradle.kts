@@ -4,8 +4,15 @@ plugins {
     id("kotlinx-serialization")
     id("com.android.library")
     id("com.squareup.sqldelight")
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
+dependencies {
+    // commonTestImplementation("dev.icerock.moko:resources-test:0.18.0")
+    // commonMainApi("dev.icerock.moko:resources:0.18.0")
+    // commonTestApi("dev.icerock.moko:resources:0.18.0")
+    androidTestImplementation("dev.icerock.moko:resources:0.18.0")
+}
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
@@ -131,4 +138,10 @@ sqldelight {
     database("KaMPKitDb") {
         packageName = "co.touchlab.kampkit.db"
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "com.touchlab.kampkit"
+    disableStaticFrameworkWarning = true
+    multiplatformResourcesSourceSet = "commonTest"  // optional, default "commonMain"
 }
