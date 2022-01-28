@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
         setContent {
             KaMPKitTheme {
-                SearchScreen(viewModel, log)
+                SearchScreen(viewModel)
             }
         }
     }

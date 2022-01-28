@@ -11,11 +11,10 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
-fun appStart(helper: DatabaseHelper, settings: Settings, dogApi: DogApi, log: Logger, clock: Clock) {
+fun appStart(helper: DatabaseHelper, settings: Settings, log: Logger, clock: Clock) {
     val coreModule = module {
         single { helper }
         single { settings }
-        single { dogApi }
         single { log }
         single { clock }
     }

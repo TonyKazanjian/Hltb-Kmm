@@ -1,8 +1,11 @@
 package co.touchlab.kampkit.scraper
+import androidx.annotation.VisibleForTesting
 import co.touchlab.kampkit.data.HowLongToBeatEntry
 import co.touchlab.kampkit.data.HowLongToBeatResponse
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.Method
+import it.skrape.fetcher.NonBlockingFetcher
+import it.skrape.fetcher.Request
 import it.skrape.fetcher.Scraper
 import it.skrape.fetcher.extractIt
 import it.skrape.fetcher.request.UrlBuilder
@@ -12,7 +15,7 @@ import it.skrape.selects.ElementNotFoundException
 import it.skrape.selects.html5.*
 import it.skrape.selects.text
 
-class AndroidSearchInteractor(private val fetcher: AndroidAsyncFetcher = AndroidAsyncFetcher): SearchInteractor {
+class AndroidSearchInteractor(private val fetcher: NonBlockingFetcher<Request> = AndroidAsyncFetcher): SearchInteractor {
     override suspend fun search(query: String, page: Int): HowLongToBeatResponse {
         return skrape(fetcher) {
             request {
@@ -47,7 +50,8 @@ class AndroidSearchInteractor(private val fetcher: AndroidAsyncFetcher = Android
         }
     }
 
-    private suspend fun parseHtmlResponse(request: Any) = (request as Scraper<*>).extractIt<HowLongToBeatResponse> { hltbResponse ->
+    @VisibleForTesting
+    suspend fun parseHtmlResponse(request: Any) = (request as Scraper<*>).extractIt<HowLongToBeatResponse> { hltbResponse ->
         val entryBuilder = HowLongToBeatEntry.Builder()
         val entryList = mutableListOf<HowLongToBeatEntry>()
         hltbResponse.statusCode = status { code }
@@ -86,7 +90,7 @@ class AndroidSearchInteractor(private val fetcher: AndroidAsyncFetcher = Android
                                 findFirst {
                                     findSecond {
                                         this.div {
-                                            parseTimeLabelDetails(entryBuilder)
+                                            parseTimeLabelDetails(this, entryBuilder)
                                         }
                                     }
                                 }
@@ -100,14 +104,14 @@ class AndroidSearchInteractor(private val fetcher: AndroidAsyncFetcher = Android
         hltbResponse.entryList = entryList
     }
 
-    private fun CssSelector.parseTimeLabelDetails(entryBuilder: HowLongToBeatEntry.Builder): HowLongToBeatEntry.Builder {
+    private fun parseTimeLabelDetails(cssSelector: CssSelector, entryBuilder: HowLongToBeatEntry.Builder): HowLongToBeatEntry.Builder {
         val storyKey = "shadow_text"
         val timeKey = "center time"
         var storyChunk = ""
         var timeLength = ""
         val timeMap = mutableMapOf<String, String>()
         try {
-            findAll {
+            cssSelector.findAll {
                 forEach { element ->
                     if (element.attributes["class"]!!.contains(storyKey)) {
                         storyChunk = element.findAll(element.attribute(storyKey)).text

@@ -1,12 +1,16 @@
+package co.touchlab.kampkit.scraper
+
+import co.touchlab.kampkit.AndroidJUnit4
 import co.touchlab.kampkit.data.HowLongToBeatEntry
 import co.touchlab.kampkit.data.HowLongToBeatResponse
-import co.touchlab.kampkit.scraper.TestSearchInteractor
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.junit.runner.RunWith
 
-internal class SearchTest {
-    private val testSearchInteractor = TestSearchInteractor(TestFetcher())
+@RunWith(AndroidJUnit4::class)
+class SearchTest {
+    private val testSearchInteractor = AndroidSearchInteractor(TestFetcher())
 
     private val expectedResponse = HowLongToBeatResponse(
         statusCode = 200,

@@ -13,15 +13,14 @@ import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 
 class SearchViewModel(private val repository: SearchRepository = SearchRepository(AndroidSearchInteractor())): ViewModel(), KoinComponent {
-
-
+    
     private val _searchStateFlow = MutableStateFlow(SearchState())
 
     fun setSearchQuery(query: String) {
         _searchStateFlow.value = SearchState(
             query = query,
             isLoading = true)
-        repository.searchGames(_searchStateFlow)
+        repository.searchGames(_searchStateFlow.asStateFlow())
     }
 
     val searchStateFlow: StateFlow<SearchState> = repository.searchGames(_searchStateFlow)

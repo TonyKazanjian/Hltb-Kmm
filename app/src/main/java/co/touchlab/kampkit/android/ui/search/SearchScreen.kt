@@ -42,7 +42,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
-    log: Logger
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
