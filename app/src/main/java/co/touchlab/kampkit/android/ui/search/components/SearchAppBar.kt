@@ -12,11 +12,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Search
@@ -33,9 +32,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import co.touchlab.kampkit.android.ui.theme.BlueSecondary
 
 @ExperimentalComposeUiApi
 @Composable
@@ -51,9 +52,9 @@ fun SearchAppBar(
         focusRequester.requestFocus()
     }
 
-    Surface(
+    TopAppBar(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colors.secondary,
+        backgroundColor = BlueSecondary,
         elevation = 8.dp
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -74,9 +75,9 @@ fun SearchAppBar(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     backgroundColor = Color.Transparent,
-                    cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    cursorColor = Color.White
                 ),
-                leadingIcon = {Icon(Icons.Outlined.Search, "Search Icon")},
+                leadingIcon = {Icon(Icons.Outlined.Search, "Search Icon", tint = Color.White)},
                 trailingIcon = {
                     AnimatedVisibility(
                         visible = showClearButton,
@@ -88,7 +89,8 @@ fun SearchAppBar(
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = "Clear search"
+                                contentDescription = "Clear search",
+                                tint = Color.White
                             )
                         }
 
@@ -109,5 +111,4 @@ fun SearchAppBar(
             )
         }
     }
-
 }

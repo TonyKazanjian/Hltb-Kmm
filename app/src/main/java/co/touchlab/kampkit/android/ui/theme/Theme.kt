@@ -6,6 +6,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -14,9 +15,10 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = BluePrimary,
+    primaryVariant = BluePrimaryVariant,
+    secondary = BlueSecondary,
+    background = Color.LightGray
 
     /* Other default colors to override
     background = Color.White,
@@ -38,7 +40,8 @@ fun KaMPKitTheme(
     } else {
         LightColorPalette
     }
-
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(colors.primaryVariant)
     MaterialTheme(
         colors = colors,
         typography = Typography,

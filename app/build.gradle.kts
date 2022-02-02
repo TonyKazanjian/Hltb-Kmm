@@ -53,6 +53,10 @@ dependencies {
 
     // Image loading
     implementation("com.github.skydoves:landscapist-coil:1.4.5")
+
+    // Accompanist
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.1-alpha")
+    
     implementation(libs.bundles.app.ui)
     coreLibraryDesugaring(libs.android.desugaring)
     implementation(libs.koin.android)
