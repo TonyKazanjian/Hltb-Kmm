@@ -70,6 +70,7 @@ fun SearchScreen(
                 },
                 onClearClick = {
                     gameQuery.value = ""
+                    viewModel.setSearchQuery(gameQuery.value)
                 })
         }
     ) {

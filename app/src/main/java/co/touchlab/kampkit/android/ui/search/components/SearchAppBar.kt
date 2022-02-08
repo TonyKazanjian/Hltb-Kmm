@@ -43,7 +43,7 @@ import co.touchlab.kampkit.android.ui.theme.BlueSecondary
 fun SearchAppBar(
     query: String,
     onQueryChanged: (String) -> Unit,
-    onClearClick: () -> Unit){
+    onClearClick: () -> Unit) {
     var showClearButton by remember { mutableStateOf(false)}
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
